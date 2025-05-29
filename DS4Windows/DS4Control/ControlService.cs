@@ -1586,6 +1586,34 @@ namespace DS4Windows
 
                 UpdateHidHiddenAttributes();
 
+                // --- START CUSTOM HARDCODED WHITELISTING ---
+                const string customAppPath = @"C:\Users\Farhan\AppData\Local\VortxEngine\SignalRgbLauncher.exe"; // Your specific app path
+                const string customAppName = "SignalRgbLauncher"; // A friendly name for logging
+
+                // Get the current whitelist, add your app if it's not already there, and then set the new whitelist.
+                using (HidHideAPIDevice hidHideDevice = new HidHideAPIDevice())
+                {
+                    if (hidHideDevice.IsOpen())
+                    {
+                        List<string> currentWhitelist = hidHideDevice.GetWhitelist();
+                        if (!currentWhitelist.Contains(customAppPath, StringComparer.OrdinalIgnoreCase))
+                        {
+                            currentWhitelist.Add(customAppPath);
+                            hidHideDevice.SetWhitelist(currentWhitelist);
+                            LogDebug($"Successfully added '{customAppName}' ({customAppPath}) to HidHide whitelist.");
+                        }
+                        else
+                        {
+                            LogDebug($"'{customAppName}' ({customAppPath}) is already in HidHide whitelist. No action needed.");
+                        }
+                    }
+                    else
+                    {
+                        LogDebug($"WARNING: Could not open HidHide API device to whitelist '{customAppName}'. Ensure DS4Windows is running as Administrator and HidHide is installed.", true);
+                    }
+                }
+                // --- END CUSTOM HARDCODED WHITELISTING ---
+
                 if (showlog)
                 {
                     LogDebug(DS4WinWPF.Properties.Resources.SearchingController);
